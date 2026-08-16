@@ -1,7 +1,9 @@
 ---
-import '../styles/global.css'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+const pageTitle = 'Augsuto Zeni | Dev FrontEnd'
 ---
 
-<div>
-  <h1 class="text-3xl font-bold text-blue-600">Hello World</h1>
-</div>
+<BaseLayout pageTitle={pageTitle}>
+  <h1>Hello World!</h1>
+</BaseLayout>
