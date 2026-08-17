@@ -1,0 +1,97 @@
+---
+import ColorBends from './ColorBends/ColorBends'
+
+const cols = 5
+const rows = 3
+const cells = Array.from({ length: cols * rows }, (_, i) => {
+  const col = i % cols
+  const row = Math.floor(i / cols)
+  const isLastCol = col === cols - 1
+  const isLastRow = row === rows - 1
+
+  const classes = ['border-white/15']
+  if (!isLastCol) classes.push('border-r')
+  if (!isLastRow) classes.push('border-b')
+
+  return classes.join(' ')
+})
+---
+
+<section class="relative w-screen h-screen bg-black overflow-hidden">
+  <div class="w-full h-full">
+    <!-- Ilha React com a animação de ondas -->
+    <div class="absolute inset-0">
+      <ColorBends
+        client:visible
+        rotation={90}
+        speed={0.2}
+        colors={['#3e3e41', '#1c1c1c', '#2d302d']}
+        transparent
+        autoRotate={0}
+        scale={1.6}
+        frequency={2.7}
+        warpStrength={0.9}
+        mouseInfluence={0}
+        parallax={0.1}
+        noise={0.25}
+        iterations={4}
+        intensity={1.2}
+        bandWidth={7}
+      />
+    </div>
+
+    <!-- Linhas da grid: camada isolada acima do conteúdo, para nunca ser coberta -->
+    <div
+      class="pointer-events-none absolute inset-0 z-10 grid h-full w-full grid-rows-3"
+      style="grid-template-columns: 3.5rem 1fr 1fr 1fr 3.5rem;"
+    >
+      {cells.map((cellClass) => <div class={cellClass} />)}
+    </div>
+
+    <div
+      class="relative z-20 grid h-full w-full grid-rows-3"
+      style="grid-template-columns: 3.5rem 1fr 1fr 1fr 3.5rem;"
+    >
+      <!-- Subtítulo -->
+      <div class="col-start-2 row-start-1 self-start pt-24 pl-2">
+        <h2 class="text-2xl font-semibold leading-snug text-foreground">
+          Web Designer &amp;<br />
+          Desenvolvedor FrontEnd
+        </h2>
+      </div>
+
+      <!-- Texto central -->
+      <div class="col-start-3 row-start-1 self-start pt-24 pl-2">
+        <p class="font-mono text-sm leading-relaxed text-foreground">
+          Código que funciona<span class="text-primary">.</span><br />
+          Design que comunica<span class="text-primary">.</span>
+        </p>
+      </div>
+
+      <!-- Texto à direita -->
+      <div class="col-start-4 row-start-1 self-start pt-24 pl-2">
+        <p class="font-mono text-sm leading-relaxed text-foreground">
+          Desenvolvedor Front-end há mais de 5 anos, com foco em web e mobile.
+          Também atuo como designer, criando interfaces pensadas para melhorar
+          experiência de uso e aumentar conversão.
+        </p>
+      </div>
+
+      <!-- Título principal -->
+      <div class="col-start-2 col-span-3 row-start-3 self-end pb-24 pl-2">
+        <h1
+          class="text-6xl font-extrabold uppercase leading-none text-foreground"
+          style={{ fontVariationSettings: '"wdth" 120' }}
+        >
+          Onde técnica<br />
+          encontra <span class="text-primary">estilo</span>
+        </h1>
+      </div>
+
+      <!-- Ícone -->
+      <div class="col-start-4 row-start-3 self-end justify-self-end pb-8 pr-4">
+        <img src="/animated-globe.svg" alt="" class="h-7 w-14" />
+      </div>
+    </div>
+  </div>
+</section>

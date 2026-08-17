@@ -1,7 +1,107 @@
 @import 'tailwindcss';
 
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: auto;
+@font-face {
+  font-family: 'TikTok Sans';
+  font-style: oblique 0deg 6deg;
+  font-weight: 300 900;
+  font-stretch: 75% 150%;
+  font-display: swap;
+  src: url('/fonts/tiktok-sans-variable.woff2') format('woff2');
+}
+
+:root {
+  --background: #1a1817;
+  --foreground: #cecec4;
+
+  --card: #201d1b;
+  --card-foreground: #cecec4;
+
+  --popover: #201d1b;
+  --popover-foreground: #cecec4;
+
+  --primary: #c4262e;
+  --primary-foreground: #f5f2ed;
+
+  --secondary: #26221f;
+  --secondary-foreground: #cecec4;
+
+  --muted: #221f1d;
+  --muted-foreground: #93908a;
+
+  --accent: #26221f;
+  --accent-foreground: #cecec4;
+
+  --destructive: #c4262e;
+  --destructive-foreground: #f5f2ed;
+
+  --border: #322d29;
+  --input: #322d29;
+  --ring: #c4262e;
+
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Fonts */
+  --font-sans: 'TikTok Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-roboto-mono), ui-monospace, monospace;
+
+  /* Fluid type scale — clamp(min, preferred, max), 375px -> 1440px viewport */
+  --text-xs: clamp(0.75rem, 0.72rem + 0.13vw, 0.8125rem);
+  --text-sm: clamp(0.875rem, 0.84rem + 0.16vw, 0.9375rem);
+  --text-base: clamp(1rem, 0.95rem + 0.19vw, 1.0625rem);
+  --text-lg: clamp(1.125rem, 1.06rem + 0.25vw, 1.25rem);
+  --text-xl: clamp(1.25rem, 1.16rem + 0.38vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.36rem + 0.56vw, 1.875rem);
+  --text-3xl: clamp(1.875rem, 1.66rem + 0.84vw, 2.375rem);
+  --text-4xl: clamp(2.25rem, 1.94rem + 1.22vw, 3rem);
+  --text-5xl: clamp(2.75rem, 2.28rem + 1.69vw, 3.75rem);
+  --text-6xl: clamp(3.25rem, 2.6rem + 2.53vw, 4.75rem);
+  --text-7xl: clamp(3.75rem, 2.78rem + 3.75vw, 6rem);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: auto;
+  }
 }
