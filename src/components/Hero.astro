@@ -15,9 +15,26 @@ const cells = Array.from({ length: cols * rows }, (_, i) => {
 
   return classes.join(' ')
 })
+
+const redCells = Array.from({ length: cols * rows }, (_, i) => {
+  const col = i % cols
+  const row = Math.floor(i / cols)
+  const isLastCol = col === cols - 1
+  const isLastRow = row === rows - 1
+
+  const classes = ['border-red-500/50']
+  if (!isLastCol) classes.push('border-r')
+  if (!isLastRow) classes.push('border-b')
+
+  return classes.join(' ')
+})
 ---
 
-<section class="relative w-screen h-screen bg-black overflow-hidden">
+<section
+  id="hero-section"
+  class="relative w-screen h-screen bg-black overflow-hidden"
+  style="--mx: 50%; --my: 50%;"
+>
   <div class="w-full h-full">
     <!-- Ilha React com a animação de ondas -->
     <div class="absolute inset-0">
@@ -46,6 +63,15 @@ const cells = Array.from({ length: cols * rows }, (_, i) => {
       style="grid-template-columns: 3.5rem 1fr 1fr 1fr 3.5rem;"
     >
       {cells.map((cellClass) => <div class={cellClass} />)}
+    </div>
+
+    <!-- Linhas da grid em vermelho: reveladas sutilmente perto do mouse -->
+    <div
+      id="hero-grid-red"
+      class="pointer-events-none absolute inset-0 z-10 grid h-full w-full grid-rows-3 opacity-0 transition-opacity duration-300"
+      style="grid-template-columns: 3.5rem 1fr 1fr 1fr 3.5rem; mask-image: radial-gradient(180px circle at var(--mx) var(--my), black, transparent 70%); -webkit-mask-image: radial-gradient(180px circle at var(--mx) var(--my), black, transparent 70%);"
+    >
+      {redCells.map((cellClass) => <div class={cellClass} />)}
     </div>
 
     <div
@@ -88,6 +114,20 @@ const cells = Array.from({ length: cols * rows }, (_, i) => {
         </h1>
       </div>
 
+      <!-- Relógio de Brasília -->
+      <div
+        class="col-start-2 row-start-3 self-end justify-self-start whitespace-nowrap pb-8 pl-2 font-mono text-sm text-foreground"
+      >
+        <span id="brasilia-clock">GMT-3 BR --:--</span>
+      </div>
+
+      <!-- Posição do mouse -->
+      <div
+        class="col-start-3 row-start-3 self-end justify-self-center whitespace-nowrap pb-8 font-mono text-sm text-foreground"
+      >
+        <span id="mouse-position">X: --- Y: ---</span>
+      </div>
+
       <!-- Ícone -->
       <div class="col-start-4 row-start-3 self-end justify-self-end pb-8 pr-4">
         <img src="/animated-globe.svg" alt="" class="h-7 w-14" />
@@ -95,3 +135,69 @@ const cells = Array.from({ length: cols * rows }, (_, i) => {
     </div>
   </div>
 </section>
+
+<script>
+  const BRASILIA_LAT = -15.7939
+  const BRASILIA_LON = -47.8828
+
+  function updateClock() {
+    const clockEl = document.getElementById('brasilia-clock')
+    if (!clockEl) return
+
+    const time = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(new Date())
+
+    const temp = clockEl.dataset.temp
+    clockEl.textContent = `GMT-3 BR ${time}${temp ? ` ${temp}°C` : ''}`
+  }
+
+  async function updateTemperature() {
+    const clockEl = document.getElementById('brasilia-clock')
+    if (!clockEl) return
+
+    try {
+      const res = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${BRASILIA_LAT}&longitude=${BRASILIA_LON}&current=temperature_2m`,
+      )
+      const data = await res.json()
+      const temp = Math.round(data?.current?.temperature_2m)
+      if (!Number.isNaN(temp)) {
+        clockEl.dataset.temp = String(temp)
+        updateClock()
+      }
+    } catch {
+      // Falha silenciosa: temperatura é só um detalhe, não deve afetar a página
+    }
+  }
+
+  updateClock()
+  setInterval(updateClock, 1000)
+
+  updateTemperature()
+  setInterval(updateTemperature, 10 * 60 * 1000)
+
+  const mousePositionEl = document.getElementById('mouse-position')
+  const heroSection = document.getElementById('hero-section')
+  const heroGridRed = document.getElementById('hero-grid-red')
+
+  document.addEventListener('mousemove', (event) => {
+    if (mousePositionEl) {
+      mousePositionEl.textContent = `X: ${event.clientX} Y: ${event.clientY}`
+    }
+
+    if (heroSection && heroGridRed) {
+      const rect = heroSection.getBoundingClientRect()
+      const x = event.clientX - rect.left
+      const y = event.clientY - rect.top
+      const inside = x >= 0 && x <= rect.width && y >= 0 && y <= rect.height
+
+      heroSection.style.setProperty('--mx', `${x}px`)
+      heroSection.style.setProperty('--my', `${y}px`)
+      heroGridRed.style.opacity = inside ? '1' : '0'
+    }
+  })
+</script>
