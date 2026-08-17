@@ -1,27 +1,97 @@
 ---
+import AnimatedGlobe from '@/components/AnimatedGlobe.astro'
+import Clock from '@/components/Clock.astro'
 
+const navLinks = [
+  { href: '#sobre', label: 'SOBRE' },
+  { href: '#projetos', label: 'PROJETOS' },
+  { href: '#contato', label: 'CONTATO' },
+]
 ---
 
-<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-16 py-9">
+<header
+  class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between pl-7 pr-5 py-5 md:px-16 md:py-9"
+>
   <!-- Logo -->
-  <div>
+  <div class="relative z-50">
     <a
-      class="text-sm font-bold tracking-wide text-foreground cursor-pointer"
-      style={{ fontVariationSettings: '"wdth" 120' }}
+      class="text-xs font-bold tracking-wide text-foreground cursor-pointer md:text-sm font-wide"
       href="/"
     >
       AUGUSTO.ZENI
     </a>
   </div>
 
-  <!-- Navegação -->
-  <nav>
+  <!-- Navegação (desktop) -->
+  <nav class="hidden md:block">
     <ul
       class="flex items-center gap-8 font-mono text-sm tracking-wide text-foreground"
     >
-      <li><a href="#sobre">SOBRE</a></li>
-      <li><a href="#projetos">PROJETOS</a></li>
-      <li><a href="#contato">CONTATO</a></li>
+      {navLinks.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
     </ul>
   </nav>
+
+  <!-- Botão hamburguer (mobile) -->
+  <button
+    id="menu-toggle"
+    type="button"
+    aria-label="Abrir menu"
+    aria-expanded="false"
+    aria-controls="mobile-menu"
+    class="relative z-50 h-8 w-8 md:hidden cursor-pointer"
+  >
+    <span
+      id="menu-bar-1"
+      class="absolute left-1/2 top-1/2 h-px w-6 bg-foreground transition-transform duration-300"
+      style="transform: translate(-50%, calc(-50% - 4px));"></span>
+    <span
+      id="menu-bar-2"
+      class="absolute left-1/2 top-1/2 h-px w-6 bg-foreground transition-transform duration-300"
+      style="transform: translate(-50%, calc(-50% + 4px));"></span>
+  </button>
+
+  <!-- Menu (mobile) -->
+  <nav
+    id="mobile-menu"
+    class="pointer-events-none fixed inset-0 z-40 flex flex-col items-start justify-center gap-8 bg-black pl-7 opacity-0 transition-opacity duration-300 md:hidden"
+  >
+    <ul
+      class="flex flex-col items-start gap-8 font-mono text-lg tracking-wide text-foreground"
+    >
+      {navLinks.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+    </ul>
+
+    <Clock class="absolute bottom-6 left-7 whitespace-nowrap font-mono text-sm text-foreground" />
+    <AnimatedGlobe class="absolute bottom-6 right-5 h-7 w-14" />
+  </nav>
 </header>
+
+<script>
+  const menuToggle = document.getElementById('menu-toggle')
+  const mobileMenu = document.getElementById('mobile-menu')
+  const bar1 = document.getElementById('menu-bar-1')
+  const bar2 = document.getElementById('menu-bar-2')
+
+  function setMenuOpen(open: boolean) {
+    if (!menuToggle || !mobileMenu || !bar1 || !bar2) return
+
+    menuToggle.setAttribute('aria-expanded', String(open))
+    mobileMenu.classList.toggle('opacity-0', !open)
+    mobileMenu.classList.toggle('pointer-events-none', !open)
+    bar1.style.transform = open
+      ? 'translate(-50%, -50%) rotate(45deg)'
+      : 'translate(-50%, calc(-50% - 4px))'
+    bar2.style.transform = open
+      ? 'translate(-50%, -50%) rotate(-45deg)'
+      : 'translate(-50%, calc(-50% + 4px))'
+  }
+
+  menuToggle?.addEventListener('click', () => {
+    const isOpen = menuToggle.getAttribute('aria-expanded') === 'true'
+    setMenuOpen(!isOpen)
+  })
+
+  mobileMenu?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => setMenuOpen(false))
+  })
+</script>

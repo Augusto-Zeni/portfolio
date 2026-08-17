@@ -1,0 +1,63 @@
+---
+interface Props {
+  id?: string
+  class?: string
+}
+
+const { id, class: className = 'whitespace-nowrap font-mono text-sm text-foreground' } = Astro.props
+---
+
+<span id={id} data-clock class={className}>GMT-3 BR --:--</span>
+
+<script>
+  const BRASILIA_LAT = -15.7939
+  const BRASILIA_LON = -47.8828
+
+  function getClockEls() {
+    return Array.from(document.querySelectorAll<HTMLElement>('[data-clock]'))
+  }
+
+  function updateClock() {
+    const clockEls = getClockEls()
+    if (clockEls.length === 0) return
+
+    const time = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(new Date())
+
+    for (const clockEl of clockEls) {
+      const temp = clockEl.dataset.temp
+      clockEl.textContent = `GMT-3 BR ${time}${temp ? ` ${temp}°C` : ''}`
+    }
+  }
+
+  async function updateTemperature() {
+    const clockEls = getClockEls()
+    if (clockEls.length === 0) return
+
+    try {
+      const res = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${BRASILIA_LAT}&longitude=${BRASILIA_LON}&current=temperature_2m`,
+      )
+      const data = await res.json()
+      const temp = Math.round(data?.current?.temperature_2m)
+      if (!Number.isNaN(temp)) {
+        for (const clockEl of clockEls) {
+          clockEl.dataset.temp = String(temp)
+        }
+        updateClock()
+      }
+    } catch {
+      // Falha silenciosa: temperatura é só um detalhe, não deve afetar a página
+    }
+  }
+
+  updateClock()
+  setInterval(updateClock, 1000)
+
+  updateTemperature()
+  setInterval(updateTemperature, 10 * 60 * 1000)
+</script>

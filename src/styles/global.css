@@ -105,3 +105,9 @@
     scroll-behavior: auto;
   }
 }
+
+@layer utilities {
+  .font-wide {
+    font-variation-settings: 'wdth' 120;
+  }
+}

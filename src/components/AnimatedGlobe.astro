@@ -1,0 +1,9 @@
+---
+interface Props {
+  class?: string
+}
+
+const { class: className = 'h-7 w-14' } = Astro.props
+---
+
+<img src="/animated-globe.svg" alt="" class={className} />

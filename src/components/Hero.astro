@@ -1,33 +1,41 @@
 ---
 import ColorBends from './ColorBends/ColorBends'
+import AnimatedGlobe from '@/components/AnimatedGlobe.astro'
+import Clock from '@/components/Clock.astro'
 
-const cols = 5
-const rows = 3
-const cells = Array.from({ length: cols * rows }, (_, i) => {
-  const col = i % cols
-  const row = Math.floor(i / cols)
-  const isLastCol = col === cols - 1
-  const isLastRow = row === rows - 1
+function buildCells(cols: number, rows: number, colorClass: string) {
+  return Array.from({ length: cols * rows }, (_, i) => {
+    const col = i % cols
+    const row = Math.floor(i / cols)
+    const isLastCol = col === cols - 1
+    const isLastRow = row === rows - 1
 
-  const classes = ['border-white/15']
-  if (!isLastCol) classes.push('border-r')
-  if (!isLastRow) classes.push('border-b')
+    const classes = [colorClass]
+    if (!isLastCol) classes.push('border-r')
+    if (!isLastRow) classes.push('border-b')
 
-  return classes.join(' ')
-})
+    return classes.join(' ')
+  })
+}
 
-const redCells = Array.from({ length: cols * rows }, (_, i) => {
-  const col = i % cols
-  const row = Math.floor(i / cols)
-  const isLastCol = col === cols - 1
-  const isLastRow = row === rows - 1
+const desktopCols = 5
+const desktopRows = 3
+const desktopCells = buildCells(desktopCols, desktopRows, 'border-white/15')
+const desktopRedCells = buildCells(
+  desktopCols,
+  desktopRows,
+  'border-red-500/50',
+)
 
-  const classes = ['border-red-500/50']
-  if (!isLastCol) classes.push('border-r')
-  if (!isLastRow) classes.push('border-b')
+const mobileCols = 4
+const mobileRows = 3
+const mobileCells = buildCells(mobileCols, mobileRows, 'border-white/15')
 
-  return classes.join(' ')
-})
+const mobileRowsClass = 'grid-rows-3'
+
+const bio = `Desenvolvedor Front-end há mais de 5 anos, com foco em web e mobile.
+Também atuo como designer, criando interfaces pensadas para melhorar
+experiência de uso e aumentar conversão.`
 ---
 
 <section
@@ -57,129 +65,111 @@ const redCells = Array.from({ length: cols * rows }, (_, i) => {
       />
     </div>
 
-    <!-- Linhas da grid: camada isolada acima do conteúdo, para nunca ser coberta -->
+    <!-- Linhas da grid (mobile) -->
     <div
-      class="pointer-events-none absolute inset-0 z-10 grid h-full w-full grid-rows-3"
-      style="grid-template-columns: 3.5rem 1fr 1fr 1fr 3.5rem;"
+      class={`pointer-events-none absolute inset-0 z-10 grid h-full w-full grid-cols-[1.25rem_1fr_1fr_1.25rem] ${mobileRowsClass} md:hidden`}
     >
-      {cells.map((cellClass) => <div class={cellClass} />)}
+      {mobileCells.map((cellClass) => <div class={cellClass} />)}
     </div>
 
-    <!-- Linhas da grid em vermelho: reveladas sutilmente perto do mouse -->
+    <!-- Linhas da grid (desktop) -->
+    <div
+      class="pointer-events-none absolute inset-0 z-10 hidden h-full w-full grid-cols-[3.5rem_1fr_1fr_1fr_3.5rem] grid-rows-3 md:grid"
+    >
+      {desktopCells.map((cellClass) => <div class={cellClass} />)}
+    </div>
+
+    <!-- Linhas da grid em vermelho -->
     <div
       id="hero-grid-red"
-      class="pointer-events-none absolute inset-0 z-10 grid h-full w-full grid-rows-3 opacity-0 transition-opacity duration-300"
-      style="grid-template-columns: 3.5rem 1fr 1fr 1fr 3.5rem; mask-image: radial-gradient(180px circle at var(--mx) var(--my), black, transparent 70%); -webkit-mask-image: radial-gradient(180px circle at var(--mx) var(--my), black, transparent 70%);"
+      class="pointer-events-none absolute inset-0 z-10 hidden h-full w-full grid-cols-[3.5rem_1fr_1fr_1fr_3.5rem] grid-rows-3 opacity-0 transition-opacity duration-300 md:grid"
+      style="mask-image: radial-gradient(180px circle at var(--mx) var(--my), black, transparent 70%); -webkit-mask-image: radial-gradient(180px circle at var(--mx) var(--my), black, transparent 70%);"
     >
-      {redCells.map((cellClass) => <div class={cellClass} />)}
+      {desktopRedCells.map((cellClass) => <div class={cellClass} />)}
     </div>
 
     <div
-      class="relative z-20 grid h-full w-full grid-rows-3"
-      style="grid-template-columns: 3.5rem 1fr 1fr 1fr 3.5rem;"
+      class={`relative z-20 grid h-full w-full grid-cols-[1.25rem_1fr_1fr_1.25rem] ${mobileRowsClass} md:grid-cols-[3.5rem_1fr_1fr_1fr_3.5rem] md:grid-rows-3`}
     >
-      <!-- Subtítulo -->
-      <div class="col-start-2 row-start-1 self-start pt-24 pl-2">
+      <!-- Subtítulo (apenas desktop) -->
+      <div
+        class="col-start-2 row-start-1 hidden self-start pt-24 pl-2 md:block"
+      >
         <h2 class="text-2xl font-semibold leading-snug text-foreground">
           Web Designer &amp;<br />
           Desenvolvedor FrontEnd
         </h2>
       </div>
 
-      <!-- Texto central -->
-      <div class="col-start-3 row-start-1 self-start pt-24 pl-2">
+      <!-- Texto central (apenas desktop) -->
+      <div
+        class="col-start-3 row-start-1 hidden self-start pt-24 pl-2 md:block"
+      >
         <p class="font-mono text-sm leading-relaxed text-foreground">
           Código que funciona<span class="text-primary">.</span><br />
           Design que comunica<span class="text-primary">.</span>
         </p>
       </div>
 
-      <!-- Texto à direita -->
-      <div class="col-start-4 row-start-1 self-start pt-24 pl-2">
+      <!-- Texto à direita / descrição (apenas desktop, versão mobile está agrupada abaixo) -->
+      <div
+        class="col-start-4 row-start-1 hidden self-start pt-24 pl-2 md:block"
+      >
         <p class="font-mono text-sm leading-relaxed text-foreground">
-          Desenvolvedor Front-end há mais de 5 anos, com foco em web e mobile.
-          Também atuo como designer, criando interfaces pensadas para melhorar
-          experiência de uso e aumentar conversão.
+          {bio}
         </p>
       </div>
 
       <!-- Título principal -->
-      <div class="col-start-2 col-span-3 row-start-3 self-end pb-24 pl-2">
+      <div
+        class="col-start-2 col-span-2 row-start-1 self-start pt-20 pl-2 md:col-start-2 md:col-span-3 md:row-start-3 md:self-end md:pt-0 md:pb-24"
+      >
         <h1
-          class="text-6xl font-extrabold uppercase leading-none text-foreground"
-          style={{ fontVariationSettings: '"wdth" 120' }}
+          class="text-4xl font-extrabold uppercase leading-none text-foreground md:text-6xl font-wide"
         >
           Onde técnica<br />
           encontra <span class="text-primary">estilo</span>
         </h1>
       </div>
 
-      <!-- Relógio de Brasília -->
+      <!-- Bloco inferior (mobile): descrição + relógio/ícone -->
       <div
-        class="col-start-2 row-start-3 self-end justify-self-start whitespace-nowrap pb-8 pl-2 font-mono text-sm text-foreground"
+        class="col-start-2 col-span-2 row-start-3 flex h-full flex-col justify-end gap-4 pb-6 pl-2 md:hidden"
       >
-        <span id="brasilia-clock">GMT-3 BR --:--</span>
+        <p class="font-mono text-sm leading-relaxed text-foreground pb-2.5">
+          {bio}
+        </p>
+        <div class="flex items-center justify-between pr-4">
+          <Clock class="whitespace-nowrap font-mono text-sm text-foreground" />
+          <AnimatedGlobe class="h-7 w-14" />
+        </div>
       </div>
 
-      <!-- Posição do mouse -->
+      <!-- Relógio (apenas desktop) -->
       <div
-        class="col-start-3 row-start-3 self-end justify-self-center whitespace-nowrap pb-8 font-mono text-sm text-foreground"
+        class="col-start-2 row-start-3 hidden self-end justify-self-start whitespace-nowrap pb-8 pl-2 font-mono text-sm text-foreground md:block"
+      >
+        <Clock class="whitespace-nowrap font-mono text-sm text-foreground" />
+      </div>
+
+      <!-- Posição do mouse (apenas desktop) -->
+      <div
+        class="col-start-3 row-start-3 hidden self-end justify-self-center whitespace-nowrap pb-8 font-mono text-sm text-foreground md:block"
       >
         <span id="mouse-position">X: --- Y: ---</span>
       </div>
 
-      <!-- Ícone -->
-      <div class="col-start-4 row-start-3 self-end justify-self-end pb-8 pr-4">
-        <img src="/animated-globe.svg" alt="" class="h-7 w-14" />
+      <!-- Ícone (apenas desktop) -->
+      <div
+        class="col-start-4 row-start-3 hidden self-end justify-self-end pb-8 pr-4 md:block"
+      >
+        <AnimatedGlobe class="h-7 w-14" />
       </div>
     </div>
   </div>
 </section>
 
 <script>
-  const BRASILIA_LAT = -15.7939
-  const BRASILIA_LON = -47.8828
-
-  function updateClock() {
-    const clockEl = document.getElementById('brasilia-clock')
-    if (!clockEl) return
-
-    const time = new Intl.DateTimeFormat('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }).format(new Date())
-
-    const temp = clockEl.dataset.temp
-    clockEl.textContent = `GMT-3 BR ${time}${temp ? ` ${temp}°C` : ''}`
-  }
-
-  async function updateTemperature() {
-    const clockEl = document.getElementById('brasilia-clock')
-    if (!clockEl) return
-
-    try {
-      const res = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${BRASILIA_LAT}&longitude=${BRASILIA_LON}&current=temperature_2m`,
-      )
-      const data = await res.json()
-      const temp = Math.round(data?.current?.temperature_2m)
-      if (!Number.isNaN(temp)) {
-        clockEl.dataset.temp = String(temp)
-        updateClock()
-      }
-    } catch {
-      // Falha silenciosa: temperatura é só um detalhe, não deve afetar a página
-    }
-  }
-
-  updateClock()
-  setInterval(updateClock, 1000)
-
-  updateTemperature()
-  setInterval(updateTemperature, 10 * 60 * 1000)
-
   const mousePositionEl = document.getElementById('mouse-position')
   const heroSection = document.getElementById('hero-section')
   const heroGridRed = document.getElementById('hero-grid-red')
